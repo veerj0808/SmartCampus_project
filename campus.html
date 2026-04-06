@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SmartCampus — VIT Bhopal | Quantum Coders</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --vit:#003f8a;
+  --vit2:#0057b8;
+  --accent:#f5a623;
+  --accent2:#ff6b35;
+  --bg:#04080f;
+  --bg2:#080d18;
+  --surface:rgba(255,255,255,0.04);
+  --surface2:rgba(255,255,255,0.07);
+  --border:rgba(255,255,255,0.08);
+  --border2:rgba(255,255,255,0.14);
+  --text:#f0f4ff;
+  --muted:#7a8aaa;
+  --hint:#4a5670;
+  --green:#00d68f;
+  --red:#ff4d6d;
+  --amber:#ffb347;
+  --r:14px;
+  --r2:10px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* ── GRAIN OVERLAY ── */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:0.4;pointer-events:none;z-index:0}
+
+/* ── GLOW ORBS ── */
+.orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
+.orb1{width:500px;height:500px;background:rgba(0,63,138,0.25);top:-100px;left:-100px}
+.orb2{width:400px;height:400px;background:rgba(245,166,35,0.1);bottom:0;right:-100px}
+
+/* ── TOPBAR ── */
+.topbar{position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:rgba(4,8,15,0.8);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:60px}
+.logo-wrap{display:flex;align-items:center;gap:12px}
+.logo-badge{background:linear-gradient(135deg,var(--vit),var(--vit2));border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:white;letter-spacing:-0.5px}
+.logo-text{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:var(--text)}
+.logo-text span{color:var(--accent)}
+.logo-sub{font-size:11px;color:var(--muted);font-weight:300}
+.nav{display:flex;gap:2px}
+.nav-btn{background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13.5px;padding:6px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s}
+.nav-btn:hover{color:var(--text);background:var(--surface2)}
+.nav-btn.active{color:var(--text);background:var(--surface2);font-weight:500}
+.user-pill{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:40px;padding:4px 12px 4px 4px}
+.avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--vit),var(--accent));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:white}
+.user-name{font-size:13px;color:var(--text)}
+.user-role{font-size:10px;color:var(--muted)}
+
+/* ── VIEWS ── */
+.view{display:none;position:relative;z-index:1;padding:2rem;max-width:1200px;margin:0 auto;animation:fadeUp 0.3s ease}
+.view.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── HERO ── */
+.hero{text-align:center;padding:3rem 0 2rem}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.25);border-radius:40px;padding:5px 14px;font-size:12px;color:var(--accent);margin-bottom:1.5rem}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.4s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:800;line-height:1.1;margin-bottom:1rem;letter-spacing:-1.5px}
+.hero h1 .hi{color:var(--accent)}
+.hero p{font-size:16px;color:var(--muted);max-width:520px;margin:0 auto 2rem;line-height:1.7;font-weight:300}
+
+/* ── AI SUGGESTION BOX ── */
+.ai-box{background:linear-gradient(135deg,rgba(0,63,138,0.2),rgba(0,87,184,0.1));border:1px solid rgba(0,87,184,0.3);border-radius:var(--r);padding:1.25rem 1.5rem;max-width:600px;margin:0 auto 2.5rem;text-align:left;position:relative;overflow:hidden}
+.ai-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--vit2),transparent)}
+.ai-header{display:flex;align-items:center;gap:8px;margin-bottom:0.6rem}
+.ai-icon{font-size:16px}
+.ai-label{font-size:11px;font-weight:600;color:var(--vit2);text-transform:uppercase;letter-spacing:0.08em}
+.ai-text{font-size:14px;color:var(--text);line-height:1.6}
+.ai-text strong{color:var(--accent)}
+.ai-chips{display:flex;gap:6px;margin-top:0.75rem;flex-wrap:wrap}
+.ai-chip{background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--muted);cursor:pointer;transition:all 0.15s}
+.ai-chip:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── STATS ROW ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:2rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:1rem 1.25rem;transition:border-color 0.15s}
+.stat-card:hover{border-color:var(--border2)}
+.stat-label{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em}
+.stat-value{font-family:'Syne',sans-serif;font-size:26px;font-weight:700}
+.stat-sub{font-size:11px;color:var(--hint);margin-top:3px}
+.stat-green{color:var(--green)}
+.stat-amber{color:var(--amber)}
+.stat-red{color:var(--red)}
+
+/* ── SECTION TITLE ── */
+.sec-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:10px}
+.sec-line{flex:1;height:1px;background:var(--border)}
+
+/* ── RESOURCE GRID ── */
+.r-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:2rem}
+.r-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.r-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,0.02));pointer-events:none}
+.r-card:hover{border-color:var(--border2);transform:translateY(-2px);background:var(--surface2)}
+.r-card.selected{border-color:var(--accent);background:rgba(245,166,35,0.05)}
+.r-card.status-busy{opacity:0.7}
+.rc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.rc-emoji{font-size:24px}
+.status-pill{font-size:10.5px;padding:3px 9px;border-radius:20px;font-weight:600;letter-spacing:0.03em}
+.s-available{background:rgba(0,214,143,0.12);color:var(--green);border:1px solid rgba(0,214,143,0.2)}
+.s-busy{background:rgba(255,77,109,0.12);color:var(--red);border:1px solid rgba(255,77,109,0.2)}
+.s-soon{background:rgba(255,179,71,0.12);color:var(--amber);border:1px solid rgba(255,179,71,0.2)}
+.rc-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:3px}
+.rc-loc{font-size:12px;color:var(--muted)}
+.rc-bar{margin:10px 0;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.rc-bar-fill{height:100%;border-radius:2px;transition:width 0.4s ease}
+.rc-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.rc-cap{font-size:11px;color:var(--muted)}
+.reserve-btn{font-size:12px;padding:5px 14px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s}
+.reserve-btn:hover{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
+.reserve-btn:disabled{opacity:0.3;cursor:not-allowed}
+.reserve-btn.pri{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
+.reserve-btn.pri:hover{background:#e09610}
+
+/* ── TABS ── */
+.tab-bar{display:flex;gap:4px;padding:4px;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:fit-content;margin-bottom:1.25rem}
+.tab{padding:6px 16px;border-radius:7px;font-size:13px;cursor:pointer;color:var(--muted);border:none;background:transparent;font-family:'DM Sans',sans-serif;transition:all 0.15s}
+.tab:hover{color:var(--text)}
+.tab.active{background:var(--vit2);color:white;font-weight:500}
+
+/* ── BOOKING PANEL ── */
+.booking-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;margin-top:1.5rem}
+.bp-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:0.5rem}
+.bp-sub{font-size:13px;color:var(--muted);margin-bottom:1.25rem}
+.bp-sub span{color:var(--accent);font-weight:500}
+
+.slot-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:1.25rem}
+.slot{padding:8px 4px;text-align:center;border-radius:8px;font-size:11.5px;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--muted);transition:all 0.12s;line-height:1.3}
+.slot:hover{border-color:var(--accent);color:var(--accent)}
+.slot.taken{background:rgba(255,77,109,0.07);color:rgba(255,77,109,0.5);border-color:rgba(255,77,109,0.2);cursor:not-allowed}
+.slot.mine{background:rgba(0,214,143,0.08);color:var(--green);border-color:rgba(0,214,143,0.25);cursor:not-allowed}
+.slot.sel{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600}
+.slot.conflict{animation:shake 0.4s ease;border-color:var(--red);background:rgba(255,77,109,0.12)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
+.form-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:1rem}
+.f-field{display:flex;flex-direction:column;gap:5px}
+.f-label{font-size:11.5px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:0.05em}
+.f-input{padding:9px 12px;border:1px solid var(--border2);border-radius:8px;font-size:13.5px;background:rgba(255,255,255,0.04);color:var(--text);font-family:'DM Sans',sans-serif;transition:border-color 0.15s}
+.f-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(245,166,35,0.12)}
+.f-input option{background:#0d1526}
+
+.alert{border-radius:10px;padding:11px 16px;font-size:13px;margin-bottom:1rem;display:none;align-items:center;gap:10px;line-height:1.4}
+.alert.show{display:flex}
+.alert-conflict{background:rgba(255,179,71,0.1);border:1px solid rgba(255,179,71,0.25);color:var(--amber)}
+.alert-success{background:rgba(0,214,143,0.08);border:1px solid rgba(0,214,143,0.2);color:var(--green)}
+.alert-error{background:rgba(255,77,109,0.08);border:1px solid rgba(255,77,109,0.2);color:var(--red)}
+
+/* ── AI SUGGESTION INLINE ── */
+.ai-suggest{background:linear-gradient(135deg,rgba(0,63,138,0.15),rgba(0,87,184,0.08));border:1px solid rgba(0,87,184,0.25);border-radius:10px;padding:10px 14px;margin-bottom:1rem;font-size:13px;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.ai-suggest strong{color:var(--text)}
+
+/* ── MY BOOKINGS ── */
+.mb-list{display:flex;flex-direction:column;gap:10px}
+.mb-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:1rem 1.25rem;display:flex;align-items:center;gap:14px;transition:border-color 0.15s}
+.mb-card:hover{border-color:var(--border2)}
+.mb-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--surface2);flex-shrink:0}
+.mb-info{flex:1}
+.mb-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700}
+.mb-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.mb-id{font-size:10px;color:var(--hint);margin-top:2px;font-family:monospace}
+.cancel-btn{font-size:12px;padding:5px 12px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s}
+.cancel-btn:hover{border-color:var(--red);color:var(--red);background:rgba(255,77,109,0.08)}
+
+/* ── MAP ── */
+.map-container{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;position:relative;margin-bottom:1.5rem}
+.map-controls{display:flex;gap:8px;padding:12px;border-bottom:1px solid var(--border);background:rgba(0,0,0,0.2)}
+.map-legend{display:flex;gap:16px;padding:10px 14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)}
+.leg-item{display:flex;align-items:center;gap:6px}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+
+/* ── ADMIN ANALYTICS ── */
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem}
+.chart-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:1rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:12px}
+.bar-label{width:100px;color:var(--muted);text-align:right;flex-shrink:0}
+.bar-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width 0.8s ease}
+.bar-val{width:36px;color:var(--text);font-weight:500}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── FOOTER ── */
+.footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:1.5rem 2rem;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--hint)}
+.footer-brand{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="topbar">
+  <div class="logo-wrap">
+    <div class="logo-badge">SC</div>
+    <div>
+      <div class="logo-text">Smart<span>Campus</span></div>
+      <div class="logo-sub">VIT Bhopal University</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <button class="nav-btn active" onclick="showView('home',this)">Dashboard</button>
+    <button class="nav-btn" onclick="showView('book',this)">Book a Slot</button>
+    <button class="nav-btn" onclick="showView('map',this)">Campus Map</button>
+    <button class="nav-btn" onclick="showView('mybookings',this)">My Bookings</button>
+    <button class="nav-btn" onclick="showView('admin',this)">Admin</button>
+  </nav>
+  <div class="user-pill">
+    <div class="avatar">VJ</div>
+    <div>
+      <div class="user-name">Veer Jain</div>
+      <div class="user-role">MIM · 25MIM10062</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ DASHBOARD ═══════════ -->
+<div class="view active" id="view-home">
+  <div class="hero">
+    <div class="hero-badge"><div class="live-dot"></div> Live Campus Status</div>
+    <h1>Book Smart.<br>Study <span class="hi">Smarter.</span></h1>
+    <p>Real-time resource booking for VIT Bhopal — libraries, auditoriums, and academic blocks. Zero queues, zero conflicts.</p>
+  </div>
+
+  <div class="ai-box">
+    <div class="ai-header">
+      <span class="ai-icon">✦</span>
+      <span class="ai-label">AI Suggestion — Quantum Coders Engine</span>
+    </div>
+    <div class="ai-text" id="ai-home-text">Based on your schedule and current occupancy, <strong>CS Lab AB1-301 is free at 2 PM today</strong>. Only 3 students have booked it this week — great time to grab a slot!</div>
+    <div class="ai-chips">
+      <div class="ai-chip" onclick="goBookFromAI('lab')">Book CS Lab now</div>
+      <div class="ai-chip" onclick="goBookFromAI('lib')">Find quiet library seat</div>
+      <div class="ai-chip" onclick="refreshAI()">Refresh suggestion ↺</div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-label">Available Now</div><div class="stat-value stat-green" id="s-avail">12</div><div class="stat-sub">of 16 resources</div></div>
+    <div class="stat-card"><div class="stat-label">My Bookings</div><div class="stat-value" id="s-mine" style="color:var(--accent)">2</div><div class="stat-sub">active this week</div></div>
+    <div class="stat-card"><div class="stat-label">Peak Hours</div><div class="stat-value stat-amber">2–5 PM</div><div class="stat-sub">book early!</div></div>
+    <div class="stat-card"><div class="stat-label">Conflicts Resolved</div><div class="stat-value stat-green">0</div><div class="stat-sub">today, system clean</div></div>
+  </div>
+
+  <div class="sec-title">All Campus Resources <div class="sec-line"></div></div>
+  <div class="r-grid" id="home-grid"></div>
+</div>
+
+<!-- ═══════════ BOOK ═══════════ -->
+<div class="view" id="view-book">
+  <div class="sec-title">Reserve a Slot <div class="sec-line"></div></div>
+
+  <div class="tab-bar" id="book-tabs">
+    <button class="tab active" onclick="switchTab('lab',this)">CS Labs</button>
+    <button class="tab" onclick="switchTab('lib',this)">Libraries</button>
+    <button class="tab" onclick="switchTab('audi',this)">Auditoriums</button>
+    <button class="tab" onclick="switchTab('class',this)">Classrooms</button>
+  </div>
+
+  <div class="r-grid" id="book-grid"></div>
+
+  <div class="booking-panel" id="booking-panel">
+    <div class="bp-title">Select a Time Slot</div>
+    <div class="bp-sub">Resource: <span id="bp-res-name">— choose a resource above —</span></div>
+
+    <div class="ai-suggest" id="ai-slot-suggest" style="display:none">
+      <span>✦</span>
+      <div id="ai-slot-text"></div>
+    </div>
+
+    <div class="slot-grid" id="slot-grid"></div>
+
+    <div class="alert alert-conflict" id="alert-conflict">⚠ Conflict detected — that slot was just grabbed by another student. Please choose a different time.</div>
+    <div class="alert alert-success" id="alert-success">✓ Booking confirmed! Your booking ID: <strong id="booking-id"></strong>. Check "My Bookings" to manage it.</div>
+    <div class="alert alert-error" id="alert-error"></div>
+
+    <div class="form-row3">
+      <div class="f-field">
+        <div class="f-label">Date</div>
+        <input class="f-input" type="date" id="f-date"/>
+      </div>
+      <div class="f-field">
+        <div class="f-label">Purpose</div>
+        <input class="f-input" type="text" id="f-purpose" placeholder="e.g. Group study, Project work…"/>
+      </div>
+      <div class="f-field">
+        <div class="f-label">Group Size</div>
+        <input class="f-input" type="number" id="f-size" min="1" max="500" placeholder="1"/>
+      </div>
+    </div>
+    <button class="reserve-btn pri" onclick="confirmBooking()">Confirm Booking →</button>
+  </div>
+</div>
+
+<!-- ═══════════ MAP ═══════════ -->
+<div class="view" id="view-map">
+  <div class="sec-title">VIT Bhopal Campus Map <div class="sec-line"></div></div>
+
+  <div class="map-container">
+    <div class="map-controls">
+      <span style="font-size:12px;color:var(--muted)">Live occupancy — click a building to book</span>
+    </div>
+    <svg width="100%" viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <defs>
+        <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+          <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
+        </pattern>
+      </defs>
+      <rect width="900" height="420" fill="#070c18"/>
+      <rect width="900" height="420" fill="url(#grid)"/>
+
+      <!-- Roads -->
+      <rect x="0" y="195" width="900" height="28" fill="rgba(255,255,255,0.04)" rx="0"/>
+      <line x1="0" y1="195" x2="900" y2="195" stroke="rgba(255,255,255,0.07)" stroke-width="1" stroke-dasharray="8,8"/>
+      <line x1="0" y1="223" x2="900" y2="223" stroke="rgba(255,255,255,0.07)" stroke-width="1" stroke-dasharray="8,8"/>
+      <rect x="400" y="0" width="28" height="420" fill="rgba(255,255,255,0.04)"/>
+      <line x1="400" y1="0" x2="400" y2="420" stroke="rgba(255,255,255,0.07)" stroke-width="1" stroke-dasharray="8,8"/>
+      <line x1="428" y1="0" x2="428" y2="420" stroke="rgba(255,255,255,0.07)" stroke-width="1" stroke-dasharray="8,8"/>
+
+      <!-- AB1 Block -->
+      <rect x="30" y="30" width="200" height="140" rx="10" fill="rgba(0,63,138,0.25)" stroke="rgba(0,87,184,0.5)" stroke-width="1.5"/>
+      <text x="130" y="60" text-anchor="middle" font-family="Syne,sans-serif" font-size="13" fill="white" font-weight="700">Academic Block 1</text>
+      <text x="130" y="78" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(255,255,255,0.5)">AB1</text>
+      <!-- Rooms in AB1 -->
+      <rect x="44" y="88" width="80" height="32" rx="5" fill="rgba(0,214,143,0.15)" stroke="rgba(0,214,143,0.4)" stroke-width="1"/>
+      <text x="84" y="102" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#00d68f">Audi 1</text>
+      <text x="84" y="113" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(0,214,143,0.7)">Available</text>
+      <rect x="136" y="88" width="80" height="32" rx="5" fill="rgba(255,77,109,0.15)" stroke="rgba(255,77,109,0.4)" stroke-width="1"/>
+      <text x="176" y="102" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#ff4d6d">Audi 2</text>
+      <text x="176" y="113" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(255,77,109,0.7)">Occupied</text>
+      <rect x="44" y="132" width="80" height="26" rx="5" fill="rgba(0,214,143,0.1)" stroke="rgba(0,214,143,0.3)" stroke-width="1"/>
+      <text x="84" y="148" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#00d68f">CS Labs</text>
+      <rect x="136" y="132" width="80" height="26" rx="5" fill="rgba(255,179,71,0.1)" stroke="rgba(255,179,71,0.3)" stroke-width="1"/>
+      <text x="176" y="148" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#ffb347">Classrooms</text>
+      <circle cx="200" cy="170" r="0" fill="none"/>
+
+      <!-- AB2 Block -->
+      <rect x="460" y="30" width="200" height="140" rx="10" fill="rgba(0,63,138,0.2)" stroke="rgba(0,87,184,0.4)" stroke-width="1.5"/>
+      <text x="560" y="60" text-anchor="middle" font-family="Syne,sans-serif" font-size="13" fill="white" font-weight="700">Academic Block 2</text>
+      <text x="560" y="78" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(255,255,255,0.5)">AB2</text>
+      <rect x="474" y="88" width="80" height="32" rx="5" fill="rgba(0,214,143,0.15)" stroke="rgba(0,214,143,0.4)" stroke-width="1"/>
+      <text x="514" y="102" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#00d68f">Audi 1</text>
+      <text x="514" y="113" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(0,214,143,0.7)">Available</text>
+      <rect x="566" y="88" width="80" height="32" rx="5" fill="rgba(255,179,71,0.15)" stroke="rgba(255,179,71,0.4)" stroke-width="1"/>
+      <text x="606" y="102" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#ffb347">Audi 2</text>
+      <text x="606" y="113" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(255,179,71,0.7)">Freeing 4PM</text>
+      <rect x="474" y="132" width="80" height="26" rx="5" fill="rgba(0,214,143,0.1)" stroke="rgba(0,214,143,0.3)" stroke-width="1"/>
+      <text x="514" y="148" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#00d68f">CS Labs</text>
+      <rect x="566" y="132" width="80" height="26" rx="5" fill="rgba(0,214,143,0.1)" stroke="rgba(0,214,143,0.3)" stroke-width="1"/>
+      <text x="606" y="148" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#00d68f">Classrooms</text>
+
+      <!-- Library 1 -->
+      <rect x="690" y="30" width="180" height="80" rx="10" fill="rgba(245,166,35,0.1)" stroke="rgba(245,166,35,0.35)" stroke-width="1.5"/>
+      <text x="780" y="58" text-anchor="middle" font-family="Syne,sans-serif" font-size="12" fill="white" font-weight="700">AB1 Library</text>
+      <text x="780" y="74" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(0,214,143,0.9)">● 80 seats available</text>
+
+      <!-- Library 2 -->
+      <rect x="690" y="130" width="180" height="80" rx="10" fill="rgba(245,166,35,0.1)" stroke="rgba(245,166,35,0.35)" stroke-width="1.5"/>
+      <text x="780" y="158" text-anchor="middle" font-family="Syne,sans-serif" font-size="12" fill="white" font-weight="700">AB2 Library</text>
+      <text x="780" y="174" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(255,179,71,0.9)">● 40 seats available</text>
+
+      <!-- Sports -->
+      <rect x="30" y="250" width="330" height="140" rx="10" fill="rgba(0,214,143,0.07)" stroke="rgba(0,214,143,0.2)" stroke-width="1"/>
+      <text x="195" y="315" text-anchor="middle" font-family="Syne,sans-serif" font-size="14" fill="rgba(0,214,143,0.8)" font-weight="700">Sports Complex</text>
+      <text x="195" y="335" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(255,255,255,0.3)">Football · Cricket · Basketball</text>
+
+      <!-- Cafeteria -->
+      <rect x="460" y="250" width="200" height="80" rx="10" fill="rgba(255,107,53,0.08)" stroke="rgba(255,107,53,0.2)" stroke-width="1"/>
+      <text x="560" y="288" text-anchor="middle" font-family="Syne,sans-serif" font-size="12" fill="rgba(255,107,53,0.8)" font-weight="700">Cafeteria</text>
+      <text x="560" y="304" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(255,255,255,0.3)">Open 7AM – 10PM</text>
+
+      <!-- Innovation Hub -->
+      <rect x="460" y="350" width="420" height="50" rx="10" fill="rgba(0,63,138,0.15)" stroke="rgba(0,87,184,0.25)" stroke-width="1"/>
+      <text x="670" y="379" text-anchor="middle" font-family="Syne,sans-serif" font-size="12" fill="rgba(0,150,255,0.8)" font-weight="700">Innovation & Research Hub — Available</text>
+    </svg>
+    <div class="map-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div> Available</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--amber)"></div> Freeing soon</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div> Occupied</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MY BOOKINGS ═══════════ -->
+<div class="view" id="view-mybookings">
+  <div class="sec-title">My Bookings <div class="sec-line"></div></div>
+  <div class="mb-list" id="mb-list"></div>
+</div>
+
+<!-- ═══════════ ADMIN ═══════════ -->
+<div class="view" id="view-admin">
+  <div class="sec-title">Admin Analytics <div class="sec-line"></div></div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-label">Total Bookings Today</div><div class="stat-value" style="color:var(--accent)">47</div><div class="stat-sub">+12 from yesterday</div></div>
+    <div class="stat-card"><div class="stat-label">Peak Occupancy</div><div class="stat-value stat-amber">94%</div><div class="stat-sub">3–4 PM block</div></div>
+    <div class="stat-card"><div class="stat-label">No-Shows</div><div class="stat-value stat-red">3</div><div class="stat-sub">Auto-released</div></div>
+    <div class="stat-card"><div class="stat-label">Conflicts Resolved</div><div class="stat-value stat-green">8</div><div class="stat-sub">By AI engine</div></div>
+  </div>
+  <div class="analytics-grid">
+    <div class="chart-card">
+      <div class="chart-title">Bookings by Resource Type</div>
+      <div class="bar-row"><div class="bar-label">CS Labs</div><div class="bar-track"><div class="bar-fill" style="width:82%;background:var(--vit2)"></div></div><div class="bar-val">82%</div></div>
+      <div class="bar-row"><div class="bar-label">Libraries</div><div class="bar-track"><div class="bar-fill" style="width:71%;background:var(--accent)"></div></div><div class="bar-val">71%</div></div>
+      <div class="bar-row"><div class="bar-label">Auditoriums</div><div class="bar-track"><div class="bar-fill" style="width:55%;background:var(--green)"></div></div><div class="bar-val">55%</div></div>
+      <div class="bar-row"><div class="bar-label">Classrooms</div><div class="bar-track"><div class="bar-fill" style="width:38%;background:var(--amber)"></div></div><div class="bar-val">38%</div></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Hourly Demand (Today)</div>
+      <div class="bar-row"><div class="bar-label">8–10 AM</div><div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--green)"></div></div><div class="bar-val">30%</div></div>
+      <div class="bar-row"><div class="bar-label">10 AM–12</div><div class="bar-track"><div class="bar-fill" style="width:55%;background:var(--green)"></div></div><div class="bar-val">55%</div></div>
+      <div class="bar-row"><div class="bar-label">12–2 PM</div><div class="bar-track"><div class="bar-fill" style="width:45%;background:var(--amber)"></div></div><div class="bar-val">45%</div></div>
+      <div class="bar-row"><div class="bar-label">2–4 PM</div><div class="bar-track"><div class="bar-fill" style="width:94%;background:var(--red)"></div></div><div class="bar-val">94%</div></div>
+      <div class="bar-row"><div class="bar-label">4–6 PM</div><div class="bar-track"><div class="bar-fill" style="width:70%;background:var(--amber)"></div></div><div class="bar-val">70%</div></div>
+      <div class="bar-row"><div class="bar-label">6–8 PM</div><div class="bar-track"><div class="bar-fill" style="width:35%;background:var(--green)"></div></div><div class="bar-val">35%</div></div>
+    </div>
+  </div>
+  <div class="chart-card" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem">
+    <div class="chart-title">AI Conflict Resolution Log</div>
+    <table style="width:100%;font-size:13px;border-collapse:collapse">
+      <thead><tr style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.05em">
+        <th style="text-align:left;padding:6px 0;border-bottom:1px solid var(--border)">Time</th>
+        <th style="text-align:left;padding:6px 0;border-bottom:1px solid var(--border)">Resource</th>
+        <th style="text-align:left;padding:6px 0;border-bottom:1px solid var(--border)">Conflict</th>
+        <th style="text-align:left;padding:6px 0;border-bottom:1px solid var(--border)">Resolution</th>
+        <th style="text-align:left;padding:6px 0;border-bottom:1px solid var(--border)">Status</th>
+      </tr></thead>
+      <tbody id="conflict-log">
+        <tr><td style="padding:8px 0;color:var(--muted)">09:14 AM</td><td>CS Lab AB1-301</td><td>2 students, same slot</td><td>First-come assigned; alt suggested</td><td><span class="status-pill s-available">Resolved</span></td></tr>
+        <tr><td style="padding:8px 0;color:var(--muted)">10:32 AM</td><td>Audi 1 AB1</td><td>Faculty override attempt</td><td>Priority rule applied</td><td><span class="status-pill s-available">Resolved</span></td></tr>
+        <tr><td style="padding:8px 0;color:var(--muted)">01:05 PM</td><td>AB2 Library</td><td>Overbooking (131/120)</td><td>Queue + waitlist activated</td><td><span class="status-pill s-soon">Waitlisted</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-brand">SmartCampus · VIT Bhopal</div>
+  <div>Built by <strong style="color:var(--accent)">Quantum Coders</strong> · PS-01 CSE Core Hackathon</div>
+  <div>Powered by AI · Real-time booking engine</div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   BACKEND DATA LAYER — SmartCampus VIT Bhopal
+   Simulates: REST API, localStorage persistence,
+   session management, conflict resolution engine,
+   real-time occupancy, booking lifecycle
+   User: Veer Jain | 25MIM10062
+═══════════════════════════════════════════════ */
+
+// ── SESSION ──────────────────────────────────
+const SESSION = {
+  userId: "25MIM10062",
+  name: "Veer Jain",
+  role: "student",
+  program: "MIM",
+  loginTime: new Date().toISOString(),
+  token: "eyVIT." + btoa("25MIM10062:" + Date.now())
+};
+
+// ── MASTER RESOURCE DATABASE ──────────────────
+const DB_RESOURCES = [
+  // CS Labs — AB1
+  {id:1,name:"CS Lab AB1-301",cat:"lab",emoji:"💻",block:"AB1",floor:3,loc:"AB1 · Floor 3",capacity:40,amenities:["AC","Projector","40 PCs","WiFi"],fill:30,baseStatus:"available"},
+  {id:2,name:"CS Lab AB1-302",cat:"lab",emoji:"💻",block:"AB1",floor:3,loc:"AB1 · Floor 3",capacity:40,amenities:["AC","Projector","40 PCs","WiFi"],fill:10,baseStatus:"available"},
+  // CS Labs — AB2
+  {id:3,name:"CS Lab AB2-201",cat:"lab",emoji:"💻",block:"AB2",floor:2,loc:"AB2 · Floor 2",capacity:35,amenities:["AC","35 PCs","WiFi"],fill:100,baseStatus:"busy"},
+  {id:4,name:"CS Lab AB2-202",cat:"lab",emoji:"💻",block:"AB2",floor:2,loc:"AB2 · Floor 2",capacity:35,amenities:["AC","35 PCs","Smart Board"],fill:45,baseStatus:"available"},
+  // Libraries
+  {id:5,name:"AB1 Central Library",cat:"lib",emoji:"📚",block:"AB1",floor:0,loc:"AB1 · Ground Floor",capacity:120,amenities:["Silent Zone","AC","WiFi","Printing"],fill:33,baseStatus:"available"},
+  {id:6,name:"AB2 Library",cat:"lib",emoji:"📖",block:"AB2",floor:0,loc:"AB2 · Ground Floor",capacity:80,amenities:["AC","WiFi","Discussion Pods"],fill:85,baseStatus:"soon"},
+  // Auditoriums — AB1
+  {id:7,name:"Audi 1 — AB1",cat:"audi",emoji:"🎭",block:"AB1",floor:1,loc:"AB1 · Ground Floor",capacity:500,amenities:["Stage","PA System","AC","Projector","Live Stream"],fill:0,baseStatus:"available"},
+  {id:8,name:"Audi 2 — AB1",cat:"audi",emoji:"🎭",block:"AB1",floor:1,loc:"AB1 · First Floor",capacity:500,amenities:["Stage","PA System","AC","Dual Screen"],fill:100,baseStatus:"busy"},
+  // Auditoriums — AB2
+  {id:9,name:"Audi 1 — AB2",cat:"audi",emoji:"🎭",block:"AB2",floor:1,loc:"AB2 · Ground Floor",capacity:400,amenities:["Stage","PA System","AC","4K Projector"],fill:20,baseStatus:"available"},
+  {id:10,name:"Audi 2 — AB2",cat:"audi",emoji:"🎭",block:"AB2",floor:1,loc:"AB2 · First Floor",capacity:400,amenities:["Stage","AC","Podium","Recording"],fill:70,baseStatus:"soon"},
+  // Classrooms
+  {id:11,name:"Classroom AB1-101",cat:"class",emoji:"🏫",block:"AB1",floor:1,loc:"AB1 · Floor 1",capacity:60,amenities:["Smart Board","AC","WiFi"],fill:0,baseStatus:"available"},
+  {id:12,name:"Classroom AB1-102",cat:"class",emoji:"🏫",block:"AB1",floor:1,loc:"AB1 · Floor 1",capacity:60,amenities:["Smart Board","AC"],fill:100,baseStatus:"busy"},
+  {id:13,name:"Classroom AB2-101",cat:"class",emoji:"🏫",block:"AB2",floor:1,loc:"AB2 · Floor 1",capacity:60,amenities:["Projector","AC","WiFi"],fill:15,baseStatus:"available"},
+  {id:14,name:"Seminar Hall AB1",cat:"class",emoji:"🏛️",block:"AB1",floor:2,loc:"AB1 · Floor 2",capacity:150,amenities:["Stage","AC","Projector","Mic Setup"],fill:10,baseStatus:"available"},
+  {id:15,name:"Innovation Lab",cat:"lab",emoji:"🔬",block:"RH",floor:1,loc:"Research Hub · Floor 1",capacity:25,amenities:["3D Printer","IoT Kits","Workstations","AC"],fill:40,baseStatus:"available"},
+  {id:16,name:"Server Room Access",cat:"lab",emoji:"🖥️",block:"AB2",floor:-1,loc:"AB2 · Basement",capacity:5,amenities:["Restricted","24×7 CCTV","Climate Controlled"],fill:80,baseStatus:"soon"},
+];
+
+// Derive live status from fill
+function liveStatus(r){
+  if(r.fill>=100)return"busy";
+  if(r.fill>=70)return"soon";
+  return"available";
+}
+const resources = DB_RESOURCES.map(r=>({...r, status:liveStatus(r)}));
+
+// ── SLOTS ─────────────────────────────────────
+const slots=["8:00 AM","9:00 AM","10:00 AM","11:00 AM","12:00 PM","1:00 PM","2:00 PM","3:00 PM","4:00 PM","5:00 PM","6:00 PM","7:00 PM"];
+
+// ── CONFLICT RESOLUTION ENGINE ────────────────
+const ConflictEngine = {
+  log: [],
+  resolve(resId, slot, userId){
+    // Check if same slot already locked by another user
+    const existing = this.getLock(resId, slot);
+    if(existing && existing.userId !== userId){
+      const alt = this.suggestAlternative(resId, slot);
+      this.log.push({time:new Date().toLocaleTimeString(),resId,slot,userId,action:"CONFLICT_BLOCKED",alt});
+      return {ok:false, conflict:true, alt};
+    }
+    this.setLock(resId, slot, userId);
+    this.log.push({time:new Date().toLocaleTimeString(),resId,slot,userId,action:"SLOT_LOCKED"});
+    return {ok:true};
+  },
+  getLock(resId, slot){
+    const key = `lock_${resId}_${slot}`;
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  },
+  setLock(resId, slot, userId){
+    const key = `lock_${resId}_${slot}`;
+    localStorage.setItem(key, JSON.stringify({userId, ts:Date.now()}));
+  },
+  removeLock(resId, slot){
+    localStorage.removeItem(`lock_${resId}_${slot}`);
+  },
+  suggestAlternative(resId, slot){
+    const idx = slots.indexOf(slot);
+    const candidates = [idx-1, idx+1, idx+2].filter(i=>i>=0&&i<slots.length);
+    for(const i of candidates){
+      if(!this.getLock(resId, slots[i])) return slots[i];
+    }
+    return null;
+  }
+};
+
+// ── BOOKING STORE (localStorage) ─────────────
+const BookingStore = {
+  KEY: `bookings_${SESSION.userId}`,
+  GLOBAL_KEY: "bookings_global",
+
+  load(){
+    try{ return JSON.parse(localStorage.getItem(this.KEY)||"[]"); }
+    catch(e){ return []; }
+  },
+  loadGlobal(){
+    try{ return JSON.parse(localStorage.getItem(this.GLOBAL_KEY)||"[]"); }
+    catch(e){ return []; }
+  },
+  save(bookings){
+    localStorage.setItem(this.KEY, JSON.stringify(bookings));
+  },
+  saveGlobal(bookings){
+    localStorage.setItem(this.GLOBAL_KEY, JSON.stringify(bookings));
+  },
+
+  create(data){
+    const bookings = this.load();
+    const global = this.loadGlobal();
+    const booking = {
+      ...data,
+      id: "VIT-" + String(Math.floor(Math.random()*90000)+10000),
+      userId: SESSION.userId,
+      userName: SESSION.name,
+      status: "confirmed",
+      createdAt: new Date().toISOString(),
+      expiresAt: null,
+    };
+    bookings.push(booking);
+    global.push(booking);
+    this.save(bookings);
+    this.saveGlobal(global);
+    ConflictEngine.setLock(data.resId, data.slot, SESSION.userId);
+    return booking;
+  },
+
+  cancel(bookingId){
+    let bookings = this.load();
+    const b = bookings.find(x=>x.id===bookingId);
+    if(b){ ConflictEngine.removeLock(b.resId, b.slot); }
+    bookings = bookings.filter(x=>x.id!==bookingId);
+    this.save(bookings);
+    let global = this.loadGlobal();
+    global = global.filter(x=>x.id!==bookingId);
+    this.saveGlobal(global);
+    return b;
+  },
+
+  getMyBookings(){ return this.load(); },
+
+  getGlobalSlotsFor(resId){
+    return this.loadGlobal()
+      .filter(b=>b.resId===resId && b.status==="confirmed")
+      .map(b=>b.slot);
+  },
+
+  // Build bookedMap from persisted global data
+  buildBookedMap(){
+    const map = {};
+    this.loadGlobal().filter(b=>b.status==="confirmed").forEach(b=>{
+      if(!map[b.resId]) map[b.resId]=[];
+      if(!map[b.resId].includes(b.slot)) map[b.resId].push(b.slot);
+    });
+    return map;
+  }
+};
+
+// ── SEED DEMO DATA if first visit ─────────────
+(function seedDemo(){
+  if(localStorage.getItem("seeded_vit")) return;
+  // Pre-populate some "other user" bookings for conflict demo
+  const g = BookingStore.loadGlobal();
+  const demos = [
+    {id:"VIT-DEMO1",userId:"OTHER1",userName:"Ananya K.",resId:3,slot:"10:00 AM",date:"Today",purpose:"Network Lab",size:15,status:"confirmed",createdAt:new Date().toISOString()},
+    {id:"VIT-DEMO2",userId:"OTHER2",userName:"Rohan M.",resId:8,slot:"2:00 PM",date:"Today",purpose:"Tech Fest Rehearsal",size:200,status:"confirmed",createdAt:new Date().toISOString()},
+    {id:"VIT-DEMO3",userId:"OTHER3",userName:"Priya S.",resId:6,slot:"11:00 AM",date:"Today",purpose:"Research Study",size:5,status:"confirmed",createdAt:new Date().toISOString()},
+    {id:"VIT-DEMO4",userId:"OTHER4",userName:"Kiran D.",resId:1,slot:"3:00 PM",date:"Today",purpose:"Data Structures Project",size:8,status:"confirmed",createdAt:new Date().toISOString()},
+  ];
+  demos.forEach(d=>{ g.push(d); ConflictEngine.setLock(d.resId,d.slot,d.userId); });
+  BookingStore.saveGlobal(g);
+  // Seed user's own bookings
+  const mine = [
+    {id:"VIT-10001",userId:SESSION.userId,userName:SESSION.name,resId:5,slot:"9:00 AM",date:"Today",purpose:"Group study — MIM Semester Prep",size:3,status:"confirmed",createdAt:new Date().toISOString()},
+    {id:"VIT-10002",userId:SESSION.userId,userName:SESSION.name,resId:9,slot:"5:00 PM",date:"Today",purpose:"Club Presentation",size:50,status:"confirmed",createdAt:new Date().toISOString()},
+  ];
+  mine.forEach(b=>{ g.push(b); ConflictEngine.setLock(b.resId,b.slot,SESSION.userId); });
+  BookingStore.save(mine);
+  BookingStore.saveGlobal(g);
+  localStorage.setItem("seeded_vit","1");
+})();
+
+// ── LIVE STATE ────────────────────────────────
+let bookedMap = BookingStore.buildBookedMap();
+let myBookings = BookingStore.getMyBookings();
+let selRes=null, selSlot=null, curTab="lab", aiIdx=0;
+
+// ── AI SUGGESTIONS ────────────────────────────
+const aiSuggestions=[
+  'Hey Veer! Based on your MIM schedule, <strong>CS Lab AB1-302 has 0 bookings tomorrow morning</strong> — ideal for your data analysis work.',
+  'Peak demand is 2–5 PM. <strong>AB1 Library mornings are 70% quieter</strong> — book a seat now for focused prep.',
+  'Audi 1 AB2 is free all Friday afternoon — <strong>great for your team presentation or club event</strong>. Only 3 bookings this week.',
+  'Your last 3 sessions were in CS Lab AB1-301. <strong>AB1-302 has better hardware and AC</strong> — try it today!',
+];
+
+// ── UI HELPERS ────────────────────────────────
+function statusPill(s){
+  if(s==="available")return'<span class="status-pill s-available">Available</span>';
+  if(s==="busy")return'<span class="status-pill s-busy">Occupied</span>';
+  return'<span class="status-pill s-soon">Freeing Soon</span>';
+}
+function barColor(f){
+  if(f<50)return'var(--green)';
+  if(f<80)return'var(--amber)';
+  return'var(--red)';
+}
+function fmtDate(iso){
+  const d=new Date(iso);
+  return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+}
+
+// ── RENDER RESOURCE GRID ──────────────────────
+function renderGrid(containerId,list){
+  document.getElementById(containerId).innerHTML=list.map(r=>`
+    <div class="r-card status-${r.status}${selRes&&selRes.id===r.id?' selected':''}" id="rc-${r.id}" onclick="selectRes(${r.id})">
+      <div class="rc-top"><span class="rc-emoji">${r.emoji}</span>${statusPill(r.status)}</div>
+      <div class="rc-name">${r.name}</div>
+      <div class="rc-loc">${r.loc}</div>
+      <div class="rc-bar"><div class="rc-bar-fill" style="width:${r.fill}%;background:${barColor(r.fill)}"></div></div>
+      <div class="rc-footer">
+        <span class="rc-cap">Cap: ${r.capacity} · ${r.amenities.slice(0,2).join(', ')}</span>
+        <button class="reserve-btn" onclick="event.stopPropagation();quickBook(${r.id})" ${r.status==='busy'?'disabled':''}>Reserve</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── SELECT RESOURCE ───────────────────────────
+function selectRes(id){
+  selRes=resources.find(r=>r.id===id);
+  selSlot=null;
+  hideAlerts();
+  document.getElementById('bp-res-name').textContent=selRes.name;
+  document.querySelectorAll('.r-card').forEach(c=>c.classList.remove('selected'));
+  const c=document.getElementById('rc-'+id);
+  if(c)c.classList.add('selected');
+  showAISuggestion(selRes);
+  // Refresh booked map from store
+  bookedMap=BookingStore.buildBookedMap();
+  renderSlots();
+}
+
+// ── AI SUGGESTION PER RESOURCE ────────────────
+function showAISuggestion(res){
+  const el=document.getElementById('ai-slot-suggest');
+  const txt=document.getElementById('ai-slot-text');
+  const taken=(bookedMap[res.id]||[]).length;
+  const msgs={
+    lab:`✦ <strong>AI Engine:</strong> ${taken} slot(s) already booked in ${res.name}. Morning slots (8–11 AM) are <strong>${taken<3?'wide open':'filling fast'}</strong> — lock one now!`,
+    lib:`✦ <strong>AI Engine:</strong> ${res.name} is at ${res.fill}% capacity. <strong>Best quiet hours: 8–11 AM.</strong> Evening slots also underused.`,
+    audi:`✦ <strong>AI Engine:</strong> ${res.name} can host up to ${res.capacity} people. <strong>Recommend booking 48hrs in advance</strong> for events over 200.`,
+    class:`✦ <strong>AI Engine:</strong> Evening slots (5–7 PM) are <strong>60% less contested</strong> in ${res.name}. Great for group sessions!`,
+  };
+  txt.innerHTML=msgs[res.cat]||msgs.lab;
+  el.style.display='flex';
+}
+
+// ── RENDER SLOTS ──────────────────────────────
+function renderSlots(){
+  const taken=(bookedMap[selRes?.id]||[]);
+  const mine=myBookings.filter(b=>b.resId===selRes?.id).map(b=>b.slot);
+  document.getElementById('slot-grid').innerHTML=slots.map(s=>{
+    const isOwn=mine.includes(s);
+    const isTaken=taken.includes(s)&&!isOwn;
+    const isSel=selSlot===s;
+    let cls='';
+    if(isOwn)cls='mine';
+    else if(isTaken)cls='taken';
+    else if(isSel)cls='sel';
+    const label=isOwn?'✓ Mine':isTaken?'Taken':s;
+    return`<div class="slot ${cls}" onclick="pickSlot('${s}')" title="${isTaken?'Booked by another student':isOwn?'Your booking':s}">${label}</div>`;
+  }).join('');
+}
+
+// ── PICK SLOT ─────────────────────────────────
+function pickSlot(s){
+  if(!selRes){showErr('Please select a resource first.');return;}
+  bookedMap=BookingStore.buildBookedMap();
+  const taken=bookedMap[selRes.id]||[];
+  const mine=myBookings.map(b=>b.slot);
+  if(taken.includes(s)&&!mine.includes(s)){
+    hideAlerts();
+    document.getElementById('alert-conflict').classList.add('show');
+    document.querySelectorAll('.slot').forEach(el=>{
+      if(el.textContent.includes(s.split(' ')[0])){
+        el.classList.add('conflict');
+        setTimeout(()=>el.classList.remove('conflict'),600);
+      }
+    });
+    return;
+  }
+  if(mine.includes(s))return;
+  selSlot=s;
+  hideAlerts();
+  renderSlots();
+}
+
+// ── CONFIRM BOOKING (with conflict engine) ────
+function confirmBooking(){
+  if(!selRes){showErr('Please select a resource.');return;}
+  if(!selSlot){showErr('Please pick a time slot.');return;}
+  // Run conflict resolution
+  bookedMap=BookingStore.buildBookedMap();
+  const result = ConflictEngine.resolve(selRes.id, selSlot, SESSION.userId);
+  if(!result.ok){
+    document.getElementById('alert-conflict').innerHTML=
+      `⚠ Conflict detected — <strong>${selSlot}</strong> was just taken. `+
+      (result.alt?`AI suggests: <strong>${result.alt}</strong> is free!`:'Try another slot.');
+    document.getElementById('alert-conflict').classList.add('show');
+    bookedMap=BookingStore.buildBookedMap();
+    renderSlots();
+    return;
+  }
+  const purpose=document.getElementById('f-purpose').value||'General use';
+  const size=parseInt(document.getElementById('f-size').value)||1;
+  const dateVal=document.getElementById('f-date').value;
+  const booking = BookingStore.create({
+    resId:selRes.id, resName:selRes.name, resEmoji:selRes.emoji,
+    slot:selSlot, date:dateVal, purpose, size,
+  });
+  myBookings=BookingStore.getMyBookings();
+  bookedMap=BookingStore.buildBookedMap();
+  document.getElementById('booking-id').textContent=booking.id;
+  hideAlerts();
+  document.getElementById('alert-success').classList.add('show');
+  document.getElementById('s-mine').textContent=myBookings.length;
+  selSlot=null;
+  renderSlots();
+  renderMyBookings();
+}
+
+// ── CANCEL BOOKING ────────────────────────────
+function cancelBooking(id){
+  BookingStore.cancel(id);
+  myBookings=BookingStore.getMyBookings();
+  bookedMap=BookingStore.buildBookedMap();
+  document.getElementById('s-mine').textContent=myBookings.length;
+  renderMyBookings();
+  if(selRes)renderSlots();
+}
+
+// ── RENDER MY BOOKINGS ────────────────────────
+function renderMyBookings(){
+  const el=document.getElementById('mb-list');
+  myBookings=BookingStore.getMyBookings();
+  if(!myBookings.length){
+    el.innerHTML='<div style="color:var(--muted);font-size:14px;padding:2rem 0;text-align:center">No bookings yet, Veer. Head to "Book a Slot" to reserve one.</div>';
+    return;
+  }
+  el.innerHTML=myBookings.map(b=>{
+    const res=resources.find(r=>r.id===b.resId)||{emoji:'📌',name:b.resName||'Resource'};
+    return`<div class="mb-card" id="mbc-${b.id}">
+      <div class="mb-icon">${res.emoji}</div>
+      <div class="mb-info">
+        <div class="mb-name">${res.name||b.resName}</div>
+        <div class="mb-meta">${b.date} · ${b.slot} · ${b.purpose} · ${b.size} person(s)</div>
+        <div class="mb-id">ID: ${b.id} · Booked at ${fmtDate(b.createdAt)} · User: ${SESSION.name} (${SESSION.userId})</div>
+      </div>
+      <span class="status-pill s-available" style="margin-right:8px">Confirmed</span>
+      <button class="cancel-btn" onclick="cancelBooking('${b.id}')">Cancel</button>
+    </div>`;
+  }).join('');
+}
+
+// ── HELPERS ───────────────────────────────────
+function hideAlerts(){['alert-conflict','alert-success','alert-error'].forEach(id=>document.getElementById(id).classList.remove('show'));}
+function showErr(msg){const el=document.getElementById('alert-error');el.textContent='⚠ '+msg;el.classList.add('show');}
+
+function switchTab(cat,btn){
+  curTab=cat;
+  document.querySelectorAll('#book-tabs .tab').forEach(t=>t.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  renderGrid('book-grid',resources.filter(r=>r.cat===cat));
+  selRes=null;selSlot=null;
+  document.getElementById('bp-res-name').textContent='— choose a resource above —';
+  document.getElementById('ai-slot-suggest').style.display='none';
+  hideAlerts();
+  renderSlots();
+}
+
+function showView(v,btn){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(v==='mybookings')renderMyBookings();
+  if(v==='book'){
+    renderGrid('book-grid',resources.filter(r=>r.cat==='lab'));
+    document.querySelectorAll('#book-tabs .tab')[0].classList.add('active');
+  }
+}
+
+function goBookFromAI(cat){
+  showView('book',document.querySelectorAll('.nav-btn')[1]);
+  setTimeout(()=>switchTab(cat,null),50);
+}
+
+function refreshAI(){
+  aiIdx=(aiIdx+1)%aiSuggestions.length;
+  document.getElementById('ai-home-text').innerHTML=aiSuggestions[aiIdx];
+}
+
+function quickBook(id){
+  showView('book',document.querySelectorAll('.nav-btn')[1]);
+  const res=resources.find(r=>r.id===id);
+  setTimeout(()=>{
+    const catMap={lab:0,lib:1,audi:2,class:3};
+    document.querySelectorAll('#book-tabs .tab').forEach(t=>t.classList.remove('active'));
+    const idx=catMap[res.cat]??0;
+    document.querySelectorAll('#book-tabs .tab')[idx].classList.add('active');
+    renderGrid('book-grid',resources.filter(r=>r.cat===res.cat));
+    setTimeout(()=>selectRes(id),100);
+  },60);
+}
+
+// ── INIT ──────────────────────────────────────
+document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+renderGrid('home-grid',resources);
+renderGrid('book-grid',resources.filter(r=>r.cat==='lab'));
+renderSlots();
+renderMyBookings();
+document.getElementById('s-mine').textContent=myBookings.length;
+
+// ── REAL-TIME OCCUPANCY SIMULATION ───────────
+setInterval(()=>{
+  resources.forEach(r=>{
+    if(r.status==='busy') return;
+    const delta=(Math.random()-0.48)*3;
+    r.fill=Math.max(0,Math.min(99,r.fill+delta));
+    r.status=liveStatus(r);
+  });
+  const activeView=document.querySelector('.view.active')?.id;
+  if(activeView==='view-home') renderGrid('home-grid',resources);
+  if(activeView==='view-book') renderGrid('book-grid',resources.filter(r=>r.cat===curTab));
+  document.getElementById('s-avail').textContent=resources.filter(r=>r.status==='available').length;
+},8000);
+</script>
+</body>
+</html>

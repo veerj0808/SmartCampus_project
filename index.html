@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SmartCampus — Sign In | VIT Bhopal</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --vit:#003f8a;--vit2:#0057b8;--accent:#f5a623;
+  --bg:#04080f;--surface:rgba(255,255,255,0.03);
+  --border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.16);
+  --text:#f0f4ff;--muted:#7a8aaa;--hint:#4a5670;
+  --green:#00d68f;--red:#ff4d6d;
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text)}
+body{display:flex;align-items:center;justify-content:center;min-height:100vh;overflow:hidden}
+
+/* Animated background */
+.bg-orb{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0}
+.orb1{width:600px;height:600px;background:rgba(0,63,138,0.22);top:-150px;left:-150px;animation:float1 8s ease-in-out infinite}
+.orb2{width:500px;height:500px;background:rgba(245,166,35,0.08);bottom:-100px;right:-100px;animation:float2 10s ease-in-out infinite}
+.orb3{width:300px;height:300px;background:rgba(0,87,184,0.1);top:50%;left:50%;transform:translate(-50%,-50%);animation:float1 6s ease-in-out infinite reverse}
+@keyframes float1{0%,100%{transform:translateY(0)}50%{transform:translateY(-30px)}}
+@keyframes float2{0%,100%{transform:translateY(0)}50%{transform:translateY(20px)}}
+
+/* Grid overlay */
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px);background-size:40px 40px;z-index:0;pointer-events:none}
+
+/* Card */
+.card{position:relative;z-index:1;background:rgba(255,255,255,0.032);border:1px solid var(--border2);border-radius:24px;padding:2.75rem 2.5rem;width:100%;max-width:460px;box-shadow:0 40px 100px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.06)}
+.card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,87,184,0.8),rgba(245,166,35,0.5),transparent)}
+
+/* Logo */
+.logo{display:flex;align-items:center;gap:14px;margin-bottom:2.25rem}
+.logo-icon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--vit),var(--vit2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:white;box-shadow:0 8px 24px rgba(0,63,138,0.4)}
+.logo-text{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;line-height:1}
+.logo-text span{color:var(--accent)}
+.logo-sub{font-size:11px;color:var(--muted);margin-top:3px;letter-spacing:0.05em}
+
+/* Heading */
+.heading{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px}
+.subheading{font-size:13.5px;color:var(--muted);margin-bottom:2rem;line-height:1.55}
+
+/* Form */
+.f-group{margin-bottom:1.1rem}
+.f-label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px}
+.f-input{width:100%;padding:11px 15px;border:1px solid var(--border2);border-radius:10px;font-size:14px;background:rgba(255,255,255,0.05);color:var(--text);font-family:'DM Sans',sans-serif;outline:none;transition:all 0.18s}
+.f-input:focus{border-color:var(--accent);background:rgba(245,166,35,0.04);box-shadow:0 0 0 3px rgba(245,166,35,0.1)}
+.f-input::placeholder{color:var(--hint)}
+.f-input option{background:#0d1526;color:var(--text)}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* Button */
+.btn{width:100%;padding:13px;margin-top:0.5rem;background:linear-gradient(135deg,#0046a0,#0057b8);border:none;border-radius:10px;color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:all 0.2s;letter-spacing:0.02em;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.08),transparent);pointer-events:none}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,63,138,0.45)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+.btn-arrow{margin-left:6px;transition:transform 0.2s}
+.btn:hover .btn-arrow{transform:translateX(4px)}
+
+/* Error */
+.err{display:none;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.3);color:var(--red);border-radius:9px;padding:10px 15px;font-size:13px;margin-top:0.9rem;align-items:center;gap:8px}
+.err.show{display:flex}
+
+/* Hint */
+.hint{margin-top:1.25rem;padding:12px 15px;background:rgba(0,87,184,0.06);border:1px solid rgba(0,87,184,0.15);border-radius:9px;font-size:12px;color:var(--hint);line-height:1.6}
+.hint strong{color:var(--muted)}
+
+/* Divider */
+.divider{display:flex;align-items:center;gap:10px;margin:1.25rem 0;font-size:11px;color:var(--hint)}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Loading state */
+.spinner{display:none;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.6s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+<div class="bg-orb orb3"></div>
+
+<div class="card">
+  <div class="logo">
+    <div class="logo-icon">SC</div>
+    <div>
+      <div class="logo-text">Smart<span>Campus</span></div>
+      <div class="logo-sub">VIT BHOPAL UNIVERSITY</div>
+    </div>
+  </div>
+
+  <div class="heading">Welcome back 👋</div>
+  <div class="subheading">Sign in with your VIT Bhopal credentials to book campus resources, schedule faculty appointments, and more.</div>
+
+  <div class="f-group">
+    <label class="f-label">VIT Registration Number</label>
+    <input class="f-input" id="inp-regno" type="text" placeholder="e.g. 25MIM10062" autocomplete="off"/>
+  </div>
+
+  <div class="f-group">
+    <label class="f-label">Full Name</label>
+    <input class="f-input" id="inp-name" type="text" placeholder="Your full name"/>
+  </div>
+
+  <div class="f-row">
+    <div class="f-group">
+      <label class="f-label">Program / Dept</label>
+      <input class="f-input" id="inp-program" type="text" placeholder="e.g. MIM, CSE…"/>
+    </div>
+    <div class="f-group">
+      <label class="f-label">Year</label>
+      <select class="f-input" id="inp-year">
+        <option value="1st Year">1st Year</option>
+        <option value="2nd Year">2nd Year</option>
+        <option value="3rd Year">3rd Year</option>
+        <option value="4th Year">4th Year</option>
+        <option value="PG/MBA">PG / MBA</option>
+        <option value="PhD">PhD</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="f-group">
+    <label class="f-label">Role</label>
+    <select class="f-input" id="inp-role">
+      <option value="student">Student</option>
+      <option value="faculty">Faculty</option>
+      <option value="admin">Admin</option>
+    </select>
+  </div>
+
+  <div class="f-group">
+    <label class="f-label">Phone (optional)</label>
+    <input class="f-input" id="inp-phone" type="tel" placeholder="+91 XXXXX XXXXX"/>
+  </div>
+
+  <button class="btn" id="login-btn" onclick="doLogin()">
+    Sign In to SmartCampus <span class="btn-arrow">→</span>
+  </button>
+
+  <div class="err" id="login-err">⚠ Please fill in Registration Number, Name, and Program to continue.</div>
+
+  <div class="hint">
+    <strong>Note:</strong> Enter your VIT Bhopal registration number, full name, and program. Your session and all booking activity will be saved locally and can be exported as a <strong>.txt</strong> file from the dashboard.
+  </div>
+</div>
+
+<script>
+// ── Check if already logged in → redirect immediately ──────────────────
+(function(){
+  const s = localStorage.getItem('sc_session');
+  if(s){
+    try{
+      const sess = JSON.parse(s);
+      if(sess && sess.userId && sess.name){
+        window.location.href = 'dashboard.html';
+        return;
+      }
+    }catch(e){}
+    localStorage.removeItem('sc_session');
+  }
+})();
+
+// ── Enter key submits ──────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if(e.key === 'Enter') doLogin();
+});
+
+// ── Login logic ────────────────────────────────────────────────────────
+function doLogin(){
+  const regNo   = document.getElementById('inp-regno').value.trim();
+  const name    = document.getElementById('inp-name').value.trim();
+  const program = document.getElementById('inp-program').value.trim();
+  const year    = document.getElementById('inp-year').value;
+  const role    = document.getElementById('inp-role').value;
+  const phone   = document.getElementById('inp-phone').value.trim();
+  const errEl   = document.getElementById('login-err');
+  const btn     = document.getElementById('login-btn');
+
+  if(!regNo || !name || !program){
+    errEl.classList.add('show');
+    return;
+  }
+  errEl.classList.remove('show');
+
+  // Disable button & show loading
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="display:inline-block"></div> Signing in…';
+
+  const session = {
+    userId:   regNo.toUpperCase(),
+    name:     name,
+    program:  program,
+    year:     year,
+    role:     role,
+    phone:    phone || 'Not provided',
+    loginTime: new Date().toISOString(),
+    loginTimeReadable: new Date().toLocaleString('en-IN', {
+      day:'2-digit', month:'long', year:'numeric',
+      hour:'2-digit', minute:'2-digit', second:'2-digit'
+    })
+  };
+
+  // Save session
+  localStorage.setItem('sc_session', JSON.stringify(session));
+
+  // Log this login to the user activity store
+  logActivity(session, 'LOGIN', 'User signed in to SmartCampus');
+
+  // Small delay for UX, then redirect
+  setTimeout(() => {
+    window.location.href = 'dashboard.html';
+  }, 600);
+}
+
+// ── Activity Logger (shared with dashboard) ───────────────────────────
+function logActivity(session, type, detail){
+  const key = 'sc_activity_' + session.userId;
+  let log = [];
+  try{ log = JSON.parse(localStorage.getItem(key) || '[]'); }catch(e){}
+  log.push({
+    timestamp: new Date().toISOString(),
+    readable: new Date().toLocaleString('en-IN'),
+    type, detail,
+    user: session.userId,
+    name: session.name
+  });
+  localStorage.setItem(key, JSON.stringify(log));
+}
+</script>
+</body>
+</html>
